@@ -1,126 +1,3 @@
-<script setup>
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
-import { usePostStore } from "@/stores/post";
-
-const {} = usePostStore();
-
-import Swal from "sweetalert2";
-import axiosAPI from "@/services/axiosAPI";
-import imageDefault from "@/assets/images/keyboard.jpg";
-import PageHeader from "@/components/PageHeader.vue";
-import BaseLabel from "@/components/BaseLabel.vue";
-import BaseInput from "@/components/BaseInput.vue";
-import BaseSelect from "@/components/BaseSelect.vue";
-import BaseTextArea from "@/components/BaseTextArea.vue";
-
-const router = useRouter();
-const authAuth = useAuthStore();
-
-const postTypes = ref(null);
-const isSelectType = ref(true);
-const isButtonSelect = ref(false);
-const isNewType = ref(false);
-
-const imageFile = ref(null);
-const imageUrl = ref(null);
-
-const form = ref({
-  title: "",
-  content: "",
-  refer: "",
-  typeID: "",
-  newType: "",
-});
-
-const onSelectType = () => {
-  if (form.value.typeID === "new") {
-    isSelectType.value = false;
-    isNewType.value = true;
-    isButtonSelect.value = true;
-    form.value.typeID = 0;
-  } else {
-    form.value.newType = 0;
-  }
-};
-
-const onSelectAgain = () => {
-  isSelectType.value = true;
-  isNewType.value = false;
-  isButtonSelect.value = false;
-};
-
-const handleImageSelected = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    imageFile.value = file;
-    imageUrl.value = URL.createObjectURL(file);
-  }
-};
-
-const onCreatePost = async () => {
-  const formData = new FormData();
-
-  formData.append("userID", authAuth.storeUser.user_login.id);
-  formData.append("title", form.value.title);
-  formData.append("content", form.value.content);
-  formData.append("refer", form.value.refer);
-  formData.append("newType", form.value.newType);
-  formData.append("typeID", form.value.typeID);
-
-  if (imageFile.value) {
-    formData.append("imageFile", imageFile.value);
-  } else {
-    const response = await fetch(imageFileBasic);
-    const blob = await response.blob();
-    const file = new File([blob], "default-image.jpg", { type: "image/jpeg" });
-    formData.append("imageFile", file);
-  }
-
-  try {
-    const response = await axiosAPI.post("/api/posts", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-
-    Swal.fire({
-      title: "Confirm post creation!",
-      text: "Do you want to confirm the creation of the post?",
-      icon: "warning",
-      showCancelButton: true,
-      cancelButtonColor: "#d33",
-      cancelButtonText: "No",
-      confirmButtonColor: "#3085d6",
-      confirmButtonText: "Yes",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: "Success",
-          text: "Post created successfully.",
-          icon: "success",
-          timer: 1200,
-        }).then(() => {
-          this.router.push({ name: "HomeView" });
-        });
-      }
-    });
-  } catch (error) {
-    console.error("Error creating post:", error);
-  }
-};
-
-const onCancel = () => {
-  router.push({ name: "HomeView" });
-};
-
-onMounted(async () => {
-  postTypes.value = await apiGetPostTypes();
-});
-</script>
-
 <template>
   <div class="bg-white rounded-xl shadow-lg mt-5 max-w-5xl m-auto p-10">
     <div class="m-auto">
@@ -220,20 +97,157 @@ onMounted(async () => {
     <!-- Buttons: Save and Cancel -->
     <div class="flex justify-end mt-5">
       <button
+        type="submit"
+        class="m-5 group relative inline-block text-sm font-medium text-white focus:ring-3 focus:outline-hidden"
         @click="onCreatePost"
-        type="button"
-        class="btn btn-primary btn-sm m-3"
       >
-        Save
+        <span class="absolute inset-0 border border-red-600"></span>
+        <span
+          class="block border border-red-600 bg-red-600 px-12 py-3 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1"
+        >
+          Download
+        </span>
       </button>
-      <button @click="onCancel" type="button" class="btn btn-danger btn-sm m-3">
-        Cancel
+
+      <button
+        type="submit"
+        class="m-5 group relative inline-block text-sm font-medium text-red-600 focus:ring-3 focus:outline-hidden"
+        @click="onCancel"
+      >
+        <span class="absolute inset-0 border border-current"></span>
+        <span
+          class="block border border-current bg-white px-12 py-3 transition-transform group-hover:-translate-x-1 group-hover:-translate-y-1"
+        >
+          Download
+        </span>
       </button>
     </div>
   </div>
 </template>
+<script setup>
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { usePostStore } from "@/stores/post";
 
+import Swal from "sweetalert2";
+import axiosAPI from "@/services/axiosAPI";
+import imageDefault from "@/assets/images/keyboard.jpg";
+import PageHeader from "@/components/PageHeader.vue";
+import BaseLabel from "@/components/BaseLabel.vue";
+import BaseInput from "@/components/BaseInput.vue";
+import BaseSelect from "@/components/BaseSelect.vue";
+import BaseTextArea from "@/components/BaseTextArea.vue";
+
+const router = useRouter();
+const authAuth = useAuthStore();
+
+const postStore = usePostStore();
+const postTypes = ref([]);
+const isSelectType = ref(true);
+const isButtonSelect = ref(false);
+const isNewType = ref(false);
+
+const imageFile = ref(null);
+const imageUrl = ref(null);
+
+const form = ref({
+  title: "",
+  content: "",
+  refer: "",
+  typeID: "",
+  newType: "",
+});
+
+onMounted(async () => {
+  postTypes.value = await postStore.storeGetPostType();
+  console.log('create post ', postTypes.value);
+});
+
+const onSelectType = () => {
+  if (form.value.typeID === "new") {
+    isSelectType.value = false;
+    isNewType.value = true;
+    isButtonSelect.value = true;
+    form.value.typeID = 0;
+  } else {
+    form.value.newType = 0;
+  }
+};
+
+const onSelectAgain = () => {
+  isSelectType.value = true;
+  isNewType.value = false;
+  isButtonSelect.value = false;
+};
+
+const handleImageSelected = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    imageFile.value = file;
+    imageUrl.value = URL.createObjectURL(file);
+  }
+};
+
+const onCreatePost = async () => {
+  const formData = new FormData();
+
+  formData.append("userID", authAuth.storeUser.user_login.id);
+  formData.append("title", form.value.title);
+  formData.append("content", form.value.content);
+  formData.append("refer", form.value.refer);
+  formData.append("newType", form.value.newType);
+  formData.append("typeID", form.value.typeID);
+
+  if (imageFile.value) {
+    formData.append("imageFile", imageFile.value);
+  } else {
+    const response = await fetch(imageFileBasic);
+    const blob = await response.blob();
+    const file = new File([blob], "default-image.jpg", { type: "image/jpeg" });
+    formData.append("imageFile", file);
+  }
+
+  try {
+    const response = await axiosAPI.post("/api/posts", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    Swal.fire({
+      title: "Confirm post creation!",
+      text: "Do you want to confirm the creation of the post?",
+      icon: "warning",
+      showCancelButton: true,
+      cancelButtonColor: "#d33",
+      cancelButtonText: "No",
+      confirmButtonColor: "#3085d6",
+      confirmButtonText: "Yes",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Success",
+          text: "Post created successfully.",
+          icon: "success",
+          timer: 1200,
+        }).then(() => {
+          router.push({ name: "HomeView" });
+        });
+      }
+    });
+  } catch (error) {
+    console.error("Error creating post:", error);
+  }
+};
+
+const onCancel = () => {
+  router.push({ name: "HomeView" });
+};
+</script>
 <style scoped>
+
 /* Image Preview Styles */
 .ibox-image-post {
   margin: auto;
@@ -244,34 +258,4 @@ onMounted(async () => {
   object-fit: cover;
 }
 
-/* Button Styles */
-.btn-outline-primary {
-  border-color: #3498db;
-  color: #3498db;
-}
-
-.btn-outline-primary:hover {
-  background-color: #3498db;
-  color: white;
-}
-
-.btn-primary {
-  background-color: #3498db;
-  color: white;
-  transition: background-color 0.3s ease;
-}
-
-.btn-primary:hover {
-  background-color: #2980b9;
-}
-
-.btn-danger {
-  background-color: #e74c3c;
-  color: white;
-  transition: background-color 0.3s ease;
-}
-
-.btn-danger:hover {
-  background-color: #c0392b;
-}
 </style>

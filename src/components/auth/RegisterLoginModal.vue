@@ -1,185 +1,3 @@
-<script setup>
-import { ref, reactive, computed, onMounted, onUnmounted } from "vue";
-import { RouterLink } from "vue-router";
-import Swal from "sweetalert2";
-import axiosAPI from "@/services/axiosAPI";
-import BaseInput from "@/components/BaseInput.vue";
-import BaseLabel from "@/components/BaseLabel.vue";
-import BaseSelect from "@/components/BaseSelect.vue";
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  TransitionChild,
-  TransitionRoot,
-} from "@headlessui/vue";
-
-import { useAuthStore } from "@/stores/auth";
-const { storeRegister, storeLogin } = useAuthStore();
-
-const open = ref(false);
-const modalType = ref("register");
-const userStatus = ref([]);
-const isSubmitting = ref(false);
-
-const emailError = ref("");
-const usernameError = ref("");
-
-const form = reactive({
-  email: "",
-  username: "",
-  password: "",
-  confirmPassword: "",
-  emailUsername: "",
-  statusID: "",
-});
-
-const openModal = (type) => {
-  modalType.value = type;
-  open.value = true;
-};
-
-const closeModal = () => {
-  open.value = false;
-  resetForm();
-};
-
-const resetForm = () => {
-  Object.assign(form, {
-    email: "",
-    username: "",
-    password: "",
-    confirmPassword: "",
-    emailUsername: "",
-    statusID: "",
-  });
-  emailError.value = "";
-  usernameError.value = "";
-};
-
-const checkEmail = async () => {
-  if (!form.email.includes("@")) {
-    emailError.value = "Invalid email format.";
-    return;
-  }
-  try {
-    const response = await axiosAPI.post("/api/register/check_email", {
-      email: form.email,
-    });
-    emailError.value = response.data.exists
-      ? "This email is already in use."
-      : "This email is available.";
-  } catch (error) {
-    console.error(error);
-    emailError.value = "Error checking email.";
-  }
-};
-
-const checkUsername = async () => {
-  if (!form.username) {
-    usernameError.value = "Please enter your username.";
-    return;
-  }
-  try {
-    const response = await axiosAPI.post("/api/register/check_username", {
-      username: form.username,
-    });
-    usernameError.value = response.data.exists
-      ? "This username is already taken."
-      : "This username can be used";
-  } catch (error) {
-    console.error(error);
-    usernameError.value = "Error checking username.";
-  }
-};
-
-const passwordError = computed(() => {
-  if (!form.password)
-    return { message: "Please enter your password.", valid: false };
-  if (form.password.length < 6)
-    return { message: "Password must be at least 6 characters.", valid: false };
-  return { message: "Password is strong.", valid: true };
-});
-
-const passwordConfirmError = computed(() => {
-  if (!form.confirmPassword)
-    return { message: "Please confirm your password.", valid: false };
-  if (form.password !== form.confirmPassword)
-    return { message: "Passwords do not match.", valid: false };
-  return { message: "Passwords match.", valid: true };
-});
-
-const onRegister = async () => {
-  if (form.password !== form.confirmPassword) {
-    Swal.fire({
-      title: "Passwords don't match",
-      text: "Please check your passwords again.",
-      icon: "error",
-      confirmButtonText: "OK",
-      confirmButtonColor: "#33cc33",
-    });
-    return;
-  }
-
-  isSubmitting.value = true;
-  try {
-    await storeRegister(form);
-    closeModal();
-  } catch (error) {
-    console.error(error);
-    Swal.fire("Error", "Registration failed.", "error");
-  } finally {
-    isSubmitting.value = false;
-  }
-};
-
-const onLogin = async () => {
-  isSubmitting.value = true;
-  try {
-    await storeLogin(form);
-    closeModal();
-  } catch (error) {
-    console.error(error);
-    Swal.fire("Error", "Login failed.", "error");
-  } finally {
-    isSubmitting.value = false;
-  }
-};
-
-const getUserStatus = async () => {
-  try {
-    const res = await fetch('/api/get_user_status', {
-      method: 'GET',
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      console.error('getUserStatus() response false ', data);
-    }
-
-    console.log('get user status success ', data.userStatus);
-
-    return data.userStatus;
-
-  } catch (error) {
-    console.error('getUserStatus() error ', error);
-  }
-  
-}
-
-onMounted(async () => {
-  userStatus.value = await getUserStatus();
-});
-
-const handleEscape = (e) => {
-  if (e.key === "Escape") closeModal();
-};
-
-onMounted(() => window.addEventListener("keydown", handleEscape));
-onUnmounted(() => window.removeEventListener("keydown", handleEscape));
-</script>
-
 <template>
   <div class="mt-4 flex justify-center gap-4 sm:mt-6">
     <a
@@ -372,3 +190,175 @@ onUnmounted(() => window.removeEventListener("keydown", handleEscape));
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref, reactive, computed, onMounted, onUnmounted } from "vue";
+import { RouterLink } from "vue-router";
+import Swal from "sweetalert2";
+import axiosAPI from "@/services/axiosAPI";
+import BaseInput from "@/components/BaseInput.vue";
+import BaseLabel from "@/components/BaseLabel.vue";
+import BaseSelect from "@/components/BaseSelect.vue";
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  TransitionChild,
+  TransitionRoot,
+} from "@headlessui/vue";
+
+import { useAuthStore } from "@/stores/auth";
+const { storeRegister, storeLogin } = useAuthStore();
+
+const open = ref(false);
+const modalType = ref("register");
+const userStatus = ref([]);
+const isSubmitting = ref(false);
+
+const emailError = ref("");
+const usernameError = ref("");
+
+const form = reactive({
+  email: "",
+  username: "",
+  password: "",
+  confirmPassword: "",
+  emailUsername: "",
+  statusID: "",
+});
+
+const openModal = (type) => {
+  modalType.value = type;
+  open.value = true;
+};
+
+const closeModal = () => {
+  open.value = false;
+  resetForm();
+};
+
+const resetForm = () => {
+  Object.assign(form, {
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+    emailUsername: "",
+    statusID: "",
+  });
+  emailError.value = "";
+  usernameError.value = "";
+};
+
+const checkEmail = async () => {
+  if (!form.email.includes("@")) {
+    emailError.value = "Invalid email format.";
+    return;
+  }
+  try {
+    const response = await axiosAPI.post("/api/register/check_email", {
+      email: form.email,
+    });
+    emailError.value = response.data.exists
+      ? "This email is already in use."
+      : "This email is available.";
+  } catch (error) {
+    console.error(error);
+    emailError.value = "Error checking email.";
+  }
+};
+
+const checkUsername = async () => {
+  if (!form.username) {
+    usernameError.value = "Please enter your username.";
+    return;
+  }
+  try {
+    const response = await axiosAPI.post("/api/register/check_username", {
+      username: form.username,
+    });
+    usernameError.value = response.data.exists
+      ? "This username is already taken."
+      : "This username can be used";
+  } catch (error) {
+    console.error(error);
+    usernameError.value = "Error checking username.";
+  }
+};
+
+const passwordError = computed(() => {
+  if (!form.password)
+    return { message: "Please enter your password.", valid: false };
+  if (form.password.length < 6)
+    return { message: "Password must be at least 6 characters.", valid: false };
+  return { message: "Password is strong.", valid: true };
+});
+
+const passwordConfirmError = computed(() => {
+  if (!form.confirmPassword)
+    return { message: "Please confirm your password.", valid: false };
+  if (form.password !== form.confirmPassword)
+    return { message: "Passwords do not match.", valid: false };
+  return { message: "Passwords match.", valid: true };
+});
+
+const onRegister = async () => {
+  if (form.password !== form.confirmPassword) {
+    Swal.fire({
+      title: "Passwords don't match",
+      text: "Please check your passwords again.",
+      icon: "error",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#33cc33",
+    });
+    return;
+  }
+
+  isSubmitting.value = true;
+  try {
+    await storeRegister(form);
+    closeModal();
+  } catch (error) {
+    console.error(error);
+    Swal.fire("Error", "Registration failed.", "error");
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const onLogin = async () => {
+  isSubmitting.value = true;
+  try {
+    await storeLogin(form);
+    closeModal();
+  } catch (error) {
+    console.error(error);
+    Swal.fire("Error", "Login failed.", "error");
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const getUserStatus = async () => {
+  try {
+    const res = await axiosAPI.get("/api/get_user_status");
+    if (res.status === 200) {
+      console.log(res.data);
+      return res.data;
+    }
+  } catch (error) {
+    console.error("Error fetching user status:", error);
+  }
+};
+
+onMounted(async () => {
+  userStatus.value = await getUserStatus();
+});
+
+const handleEscape = (e) => {
+  if (e.key === "Escape") closeModal();
+};
+
+onMounted(() => window.addEventListener("keydown", handleEscape));
+onUnmounted(() => window.removeEventListener("keydown", handleEscape));
+</script>

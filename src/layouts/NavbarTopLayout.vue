@@ -102,7 +102,13 @@ const user = {
             >
               <span class="absolute -inset-1.5" />
               <span class="sr-only">View notifications</span>
-              <BellIcon class="size-6" aria-hidden="true" />
+              <img
+                class="size-6"
+                aria-hidden="true"
+                src="../assets/images/keyboard.jpg"
+                alt=""
+              />
+              <!-- <BellIcon class="size-6" aria-hidden="true" /> -->
             </button>
 
             <!-- Profile Image dropdown -->
@@ -115,7 +121,7 @@ const user = {
                   <span class="sr-only">Open user menu</span>
                   <img
                     class="size-8 rounded-full"
-                    :src="user.imageUrl"
+                    src="../assets/images/keyboard.jpg"
                     alt=""
                   />
                 </MenuButton>
@@ -155,8 +161,22 @@ const user = {
           >
             <span class="absolute -inset-0.5" />
             <span class="sr-only">Open main menu</span>
-            <Bars3Icon v-if="!open" class="block size-6" aria-hidden="true" />
-            <XMarkIcon v-else class="block size-6" aria-hidden="true" />
+            <img
+              v-if="!open"
+              class="block size-6"
+              aria-hidden="true"
+              src="../assets/images/keyboard.jpg"
+              alt=""
+            />
+            <img
+              v-else
+              class="block size-6"
+              aria-hidden="true"
+              src="../assets/images/keyboard.jpg"
+              alt=""
+            />
+            <!-- <Bars3Icon v-if="!open" class="block size-6" aria-hidden="true" /> -->
+            <!-- <XMarkIcon v-else class="block size-6" aria-hidden="true" /> -->
           </DisclosureButton>
         </div>
       </div>
@@ -182,7 +202,11 @@ const user = {
       <div class="border-t border-gray-700 pt-4 pb-3">
         <div class="flex items-center px-5">
           <div class="shrink-0">
-            <img class="size-10 rounded-full" :src="user.imageUrl" alt="" />
+            <img
+              class="size-10 rounded-full"
+              src="../assets/images/keyboard.jpg"
+              alt=""
+            />
           </div>
           <div class="ml-3">
             <div class="text-base/5 font-medium text-white">
@@ -198,7 +222,13 @@ const user = {
           >
             <span class="absolute -inset-1.5" />
             <span class="sr-only">View notifications</span>
-            <BellIcon class="size-6" aria-hidden="true" />
+            <img
+              class="size-6"
+              aria-hidden="true"
+              src="../assets/images/keyboard.jpg"
+              alt=""
+            />
+            <!-- <BellIcon class="size-6" aria-hidden="true" /> -->
           </button>
         </div>
         <div class="mt-3 space-y-1 px-2">

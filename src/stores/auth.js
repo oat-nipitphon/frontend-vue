@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import Swal from "sweetalert2";
-
+import axiosAPI from "@/services/axiosAPI";
 export const useAuthStore = defineStore("authStore", {
   state: () => ({
     users: null,
@@ -9,29 +9,39 @@ export const useAuthStore = defineStore("authStore", {
   actions: {
     async storeAuth() {
       try {
-        const token = localStorage.getItem("token");
-        if (token) {
-          const res = await fetch(`/api/user`, {
-            method: "GET",
-            headers: {
-              authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          });
-
-          const data = await res.json();
-
-          if (res.ok) {
-            this.users = data.users;
-          } else {
-            this.users = "";
-          }
-        } else {
-          token = null;
+        let token = localStorage.getItem("token");
+        if (!token) {
+          console.log("store auth token null");
+          return;
         }
-        return;
+
+        const res = await fetch(`/api/user`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          console.error(
+            "store auth response not OK:",
+            res.status,
+            res.statusText
+          );
+          return;
+        }
+
+        const data = await res.json();
+
+        if (!data || !data.users) {
+          console.warn("store auth response user data missing");
+          return;
+        }
+
+        this.users = data.users;
       } catch (error) {
-        console.error("store function auth store");
+        console.error("store function auth store error:", error);
       }
     },
 

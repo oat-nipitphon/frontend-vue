@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
+import PageHeader from "@/components/PageHeader.vue";
 
 const authStore = useAuthStore();
 const { users } = storeToRefs(authStore);
@@ -69,18 +70,14 @@ const posts = [
   <div class="bg-white shadow-sm">
     <div class="bg-white py-10 sm:py-10">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
-        <div class="mx-auto max-w-2xl lg:mx-0">
-          <h2
-            class="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl"
+        <PageHeader title="HomeView" />
+        <div class="flex justify-end bg-white shadow-lg rounded-lg p-5">
+          <RouterLink
+            class="inline-block rounded-sm bg-indigo-600 px-8 py-3 text-sm font-medium text-white transition hover:scale-110 hover:shadow-xl focus:ring-3 focus:outline-hidden"
+            :to="{ name: 'CreatePostView' }"
           >
-            From the blog
-          </h2>
-          <p v-if="!authStore.users" class="mt-2 text-lg/8 text-gray-600">
-            Learn how to grow your business with our expert advice.
-          </p>
-          <p v-else class="mt-2 text-lg/8 text-gray-600">
-            {{ authStore.users }}
-          </p>
+            Create Post
+          </RouterLink>
         </div>
         <div
           class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3"

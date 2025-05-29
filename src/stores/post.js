@@ -3,21 +3,23 @@ import Swal from "sweetalert2";
 
 export const usePostStore = defineStore("postStore", {
   state: () => ({
-    posts: null,
+    storePost: null,
+    storePosts: [],
+    storePostTypes: [],
     errors: {},
   }),
   actions: {
     async storeGetPostType() {
       try {
-        const res = await fetch(`/api/postTypes`, {
+        const res = await fetch(`/api/get_post_type`, {
           method: "GET",
         });
         const data = await res.json();
         if (res.ok) {
-          return data.postTypes;
-        } else {
-          data = "";
+          this.storePostTypes = data;
         }
+
+        console.log("store get post type response false");
         return;
       } catch (error) {
         console.error("store get post type function api error ", error);
@@ -26,23 +28,33 @@ export const usePostStore = defineStore("postStore", {
 
     async storeGetPosts() {
       try {
-        const res = await fetch(`/api/posts`, {
+        const res = await fetch("/api/get_user_status", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
 
         const data = await res.json();
-        if (res.ok) {
-          return data.posts;
-        } else {
-          data = "";
+
+        if (!res.ok) {
+          console.error("getUserStatus() response false", data);
+          return null; // หรือจะโยน error ก็ได้ throw new Error(...)
         }
-        return;
+
+        if (!data || typeof data.userStatus === "undefined") {
+          console.warn(
+            "getUserStatus() userStatus not found in response",
+            data
+          );
+          return null;
+        }
+
+        console.log("get user status success", data.userStatus);
+        return data.userStatus;
       } catch (error) {
-        console.error("store function api get posts error", error);
+        console.error("getUserStatus() error", error);
+        return null;
       }
     },
 
@@ -143,5 +155,4 @@ export const usePostStore = defineStore("postStore", {
       return;
     },
   },
-
 });

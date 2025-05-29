@@ -1,2 +1,2 @@
-# frontend-vue-tailwind
-vue version 3 - tailwind version 4
+# frontend-vue
+vue version 3
