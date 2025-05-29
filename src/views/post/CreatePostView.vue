@@ -4,7 +4,7 @@
       <PageHeader title="Create post" />
     </div>
 
-    <!-- Post Title -->
+    <!-- Title -->
     <div class="mt-3">
       <BaseLabel for-id="labelPostTitle" text="Title" />
       <BaseInput
@@ -15,18 +15,19 @@
       />
     </div>
 
-    <!-- Post Content -->
+    <!-- Content -->
     <div class="mt-3">
       <BaseLabel for-id="labelPostContent" text="Content" />
-      <BaseTextArea
+      <EditorPost />
+      <!-- <BaseTextArea
         id="postContent"
         type="text"
         placeholder="input content ..."
         v-model="form.content"
-      />
+      /> -->
     </div>
 
-    <!-- Post Refer -->
+    <!-- Refer -->
     <div class="mt-3">
       <BaseLabel for-id="labelRefer" text="Refer" />
       <BaseInput
@@ -37,8 +38,9 @@
       />
     </div>
 
+    <!-- Select Type -->
     <div class="mt-3">
-      <!-- Select Type Post -->
+      <!-- Select Type -->
       <div class="grid mt-5" v-if="isSelectType">
         <BaseLabel for-id="labelSeleteType" text="Select type" />
         <BaseSelect
@@ -54,7 +56,7 @@
         </BaseSelect>
       </div>
 
-      <!-- New Type Post -->
+      <!-- Add New Type -->
       <div class="grid grid-rows-2 mt-5" v-if="isNewType">
         <div class="grid grid-cols-2">
           <div>
@@ -75,7 +77,7 @@
       </div>
     </div>
 
-    <!-- Upload File Section -->
+    <!-- Upload File Image -->
     <div class="mt-3">
       <BaseLabel for-id="labelImage" text="Image" />
       <div class="bg-white mt-2">
@@ -94,7 +96,7 @@
       </div>
     </div>
 
-    <!-- Buttons: Save and Cancel -->
+    <!-- Button Event on Function -->
     <div class="flex justify-end mt-5">
       <button
         type="submit"
@@ -122,11 +124,13 @@
         </span>
       </button>
     </div>
+
   </div>
 </template>
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { storeToRefs } from 'pinia';
 import { useAuthStore } from "@/stores/auth";
 import { usePostStore } from "@/stores/post";
 
@@ -138,11 +142,13 @@ import BaseLabel from "@/components/BaseLabel.vue";
 import BaseInput from "@/components/BaseInput.vue";
 import BaseSelect from "@/components/BaseSelect.vue";
 import BaseTextArea from "@/components/BaseTextArea.vue";
+import EditorPost from "@/components/EditorPost.vue";
 
 const router = useRouter();
 const authAuth = useAuthStore();
 
 const postStore = usePostStore();
+const { storePostTypes } = storeToRefs(postStore);
 const postTypes = ref([]);
 const isSelectType = ref(true);
 const isButtonSelect = ref(false);
