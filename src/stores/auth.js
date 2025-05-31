@@ -71,27 +71,23 @@ export const useAuthStore = defineStore("authStore", {
 
           if (res.ok) {
             localStorage.setItem("token", data.token);
-            await Swal.fire(
-              "Success",
-              "Registration completed successfully!",
-              "success"
-            );
             this.router.push({ name: "HomeView" });
           } else {
+            console.log('store register response false ', data.message);
             await Swal.fire({
               title: "Registration Failed",
-              text: data.message || "Please try again.",
+              text: "Please try again.",
               icon: "error",
               showCancelButton: true,
               confirmButtonText: "Login",
-              cancelButtonText: "Back to Index",
+              cancelButtonText: "Reset Password",
               confirmButtonColor: "#3085d6",
               cancelButtonColor: "#d33",
             }).then((actionResult) => {
               if (actionResult.isConfirmed) {
                 this.router.push({ name: "LoginView" });
               } else {
-                this.router.push({ name: "IndexView" });
+                this.router.push({ name: "ResetPasswordView" });
               }
             });
           }
@@ -124,7 +120,7 @@ export const useAuthStore = defineStore("authStore", {
             timerProgressBar: true,
             showConfirmButton: false,
           });
-          this.router.push({ name: "home" });
+          this.router.push({ name: "HomeView" });
         } else {
           await Swal.fire({
             title: "Login failed",
