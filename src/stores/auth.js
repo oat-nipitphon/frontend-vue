@@ -8,13 +8,11 @@ export const useAuthStore = defineStore("authStore", {
   }),
   actions: {
     async storeAuth() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
       try {
-        let token = localStorage.getItem("token");
-        if (!token) {
-          console.log("store auth token null");
-          return;
-        }
-
         const res = await fetch(`/api/user`, {
           method: "GET",
           headers: {
@@ -24,21 +22,9 @@ export const useAuthStore = defineStore("authStore", {
         });
 
         if (!res.ok) {
-          console.error(
-            "store auth response not OK:",
-            res.status,
-            res.statusText
-          );
           return;
         }
-
         const data = await res.json();
-
-        if (!data || !data.users) {
-          console.warn("store auth response user data missing");
-          return;
-        }
-
         this.users = data.users;
       } catch (error) {
         console.error("store function auth store error:", error);
@@ -73,7 +59,7 @@ export const useAuthStore = defineStore("authStore", {
             localStorage.setItem("token", data.token);
             this.router.push({ name: "HomeView" });
           } else {
-            console.log('store register response false ', data.message);
+            console.log("store register response false ", data.message);
             await Swal.fire({
               title: "Registration Failed",
               text: "Please try again.",

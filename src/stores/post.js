@@ -3,9 +3,9 @@ import Swal from "sweetalert2";
 
 export const usePostStore = defineStore("postStore", {
   state: () => ({
-    storePost: null,
-    storePosts: [],
-    storePostTypes: [],
+    post: null,
+    posts: [],
+    postType: [],
     errors: {},
   }),
   actions: {
@@ -14,13 +14,13 @@ export const usePostStore = defineStore("postStore", {
         const res = await fetch(`/api/get_post_type`, {
           method: "GET",
         });
-        const data = await res.json();
-        if (res.ok) {
-          this.storePostTypes = data;
-        }
 
-        console.log("store get post type response false");
-        return;
+        if (!res.ok) {
+          console.error("store get post type require false", res);
+          return;
+        }
+        const data = await res.json();
+        this.postType = data.postType;
       } catch (error) {
         console.error("store get post type function api error ", error);
       }
@@ -35,50 +35,57 @@ export const usePostStore = defineStore("postStore", {
           },
         });
 
-        const data = await res.json();
-
         if (!res.ok) {
-          console.error("getUserStatus() response false", data);
-          return null; // หรือจะโยน error ก็ได้ throw new Error(...)
+          console.error("store get posts require false", res);
+          return;
         }
-
-        if (!data || typeof data.userStatus === "undefined") {
-          console.warn(
-            "getUserStatus() userStatus not found in response",
-            data
-          );
-          return null;
-        }
-
-        console.log("get user status success", data.userStatus);
-        return data.userStatus;
+        const data = await res.json();
+        this.posts = data.posts;
       } catch (error) {
         console.error("getUserStatus() error", error);
-        return null;
       }
     },
 
     async storeCreatePost(formData) {
+      const result = await Swal.fire({
+        title: "Confirm post creation!",
+        text: "Do you want to confirm the creation of the post?",
+        icon: "warning",
+        showCancelButton: true,
+        cancelButtonColor: "#d33",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Confirm",
+      });
+
+      if (!result.isConfirmed) {
+        Swal.close();
+        return;
+      }
+
       try {
         const res = await fetch(`/api/posts`, {
           method: "POST",
           headers: {
-            "Content-Type": "multipart/form-data",
-            authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: formData,
         });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          console.log("store create post success ", res);
-          console.log("store create post success ", data);
-        } else {
-          console.log("store create post false", res);
+        if (!res.ok) {
+          console.log("store create require false ", res);
+          return;
         }
+        const data = await res.json();
+        Swal.fire({
+          title: 'Success',
+          icon: 'success',
+          timer: 1500,
+          timerProgressBar: true
+        });
+        this.router.push({ name: 'HomeView' });
+        return data;
       } catch (error) {
-        console.error("store create post function api error ", error);
+        console.error("store create post function api error ".error);
       }
     },
 

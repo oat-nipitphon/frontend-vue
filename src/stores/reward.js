@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 
 export const useRewardStore = defineStore("rewardStore", {
   state: () => ({
-    rewards: null,
+    rewards: [],
     errors: [],
   }),
   actions: {
@@ -17,13 +17,15 @@ export const useRewardStore = defineStore("rewardStore", {
             authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
-        const data = await res.json();
-        if (res.ok) {
-          this.rewards = data.rewards;
-        } else {
-          this.rewards = "";
+        if (!res.ok) {
+          console.error('store get rewards request false', res)
+          return;
         }
-        return;
+        
+        const data = await res.json();
+        this.rewards = data.rewards;
+        console.log('store get rewards', this.rewards);
+
       } catch (error) {
         console.error("store get reward function api error ", error);
       }
