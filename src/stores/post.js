@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 import Swal from "sweetalert2";
-
+import axiosAPI from "@/services/axiosAPI";
 export const usePostStore = defineStore("postStore", {
   state: () => ({
     post: null,
-    posts: [],
+    storePosts: [],
     postType: [],
     errors: {},
   }),
@@ -28,21 +28,22 @@ export const usePostStore = defineStore("postStore", {
 
     async storeGetPosts() {
       try {
-        const res = await fetch("/api/get_user_status", {
-          method: "GET",
+        const res = await fetch(`/api/posts`, {
+          method: 'GET',
           headers: {
-            "Content-Type": "application/json",
-          },
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
         });
-
-        if (!res.ok) {
-          console.error("store get posts require false", res);
-          return;
-        }
         const data = await res.json();
-        this.posts = data.posts;
+        if (res.ok) {
+          console.log('store get posts success ', data.posts);
+          this.storePosts = data.posts;
+        } else {
+          console.log('store get posts false ', res.error);
+        }
+
       } catch (error) {
-        console.error("getUserStatus() error", error);
+        console.error('store get posts function api error ', error);
       }
     },
 
@@ -64,28 +65,38 @@ export const usePostStore = defineStore("postStore", {
       }
 
       try {
-        const res = await fetch(`/api/posts`, {
-          method: "POST",
+        const res = await axiosAPI.post("/api/posts", formData, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "multipart/form-data",
+            authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: formData,
         });
-        if (!res.ok) {
-          console.log("store create require false ", res);
-          return;
+
+        if (res.status === 200 || res.status === 201) {
+          console.log('store create post success');
+          Swal.fire({
+            title: "Successfully",
+            text: "Your created post success.",
+            icon: "success",
+            timer: 1500,
+            timerProgressBar: true,
+          }).then(() => {
+            this.router.push({ name: "HomeView" });
+          });
+        } else {
+           console.log('store create post false');
+          Swal.fire({
+            title: "False",
+            text: "Your created post false.",
+            icon: "error",
+            timer: 1500,
+            timerProgressBar: true,
+          }).then(() => {
+            window.location.reload();
+          });
         }
-        const data = await res.json();
-        Swal.fire({
-          title: 'Success',
-          icon: 'success',
-          timer: 1500,
-          timerProgressBar: true
-        });
-        this.router.push({ name: 'HomeView' });
-        return data;
       } catch (error) {
-        console.error("store create post function api error ".error);
+        console.error("store create post function api error", error);
       }
     },
 

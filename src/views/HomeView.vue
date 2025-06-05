@@ -3,12 +3,15 @@ import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
+import { usePostStore } from '@/stores/post';
 import PageHeader from "@/components/PageHeader.vue";
 
 const authStore = useAuthStore();
 const { users } = storeToRefs(authStore);
+const postStore = usePostStore();
+const { storePosts } = storeToRefs(postStore);
 
-console.log("home view ", authStore.users);
+console.log('Home View ', postStore.storePosts);
 
 const posts = [
   {
