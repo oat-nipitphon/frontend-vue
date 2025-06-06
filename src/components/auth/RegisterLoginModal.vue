@@ -343,7 +343,6 @@ const getUserStatus = async () => {
   try {
     const res = await axiosAPI.get("/api/get_user_status");
     if (res.status === 200) {
-      console.log(res.data);
       return res.data;
     }
   } catch (error) {

@@ -207,9 +207,9 @@ const onCreatePost = async () => {
   }
 
   // Check data require form data
-  for (const [key, value] of formData.entries()) {
-    console.log(`${key}:`, value);
-  }
+  // for (const [key, value] of formData.entries()) {
+  //   console.log(`${key}:`, value);
+  // }
 
   await storeCreatePost(formData);
 

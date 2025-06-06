@@ -34,13 +34,15 @@ export const usePostStore = defineStore("postStore", {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
         });
-        const data = await res.json();
-        if (res.ok) {
-          console.log('store get posts success ', data.posts);
-          this.storePosts = data.posts;
-        } else {
-          console.log('store get posts false ', res.error);
+
+        if (!res.status === 200) {
+          this.storePosts = 'store require posts false', res.error;
         }
+
+        const data = await res.json();
+        this.storePosts = data.posts;
+
+        console.log('store require posts true', this.storePosts);
 
       } catch (error) {
         console.error('store get posts function api error ', error);
@@ -100,7 +102,7 @@ export const usePostStore = defineStore("postStore", {
       }
     },
 
-    async storeGetPostShow(post) {
+    async storeGetPostShow (post) {
       try {
         const res = await fetch(`/api/posts/${post}`, {
           method: "GET",
@@ -123,21 +125,19 @@ export const usePostStore = defineStore("postStore", {
       }
     },
 
-    async apiEditPost(formData) {
-      console.log("store update post function ", formData);
-      return;
-      const result = await Swal.fire({
-        title: "Confirm Edit!",
-        text: "Are you sure you want to edit this post?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Confirm",
-      });
+    async storeUpdatePost (formData) {
+      try {
+        
+        for (const [key, value] of formData.entries()) {
+          console.log(`${key}:`, value);
+        }
+
+      } catch (error) {
+        console.error('store update post', error);
+      }
     },
 
-    async apiDeletePost(id) {
+    async storeDeletePost (id) {
       const result = await Swal.fire({
         title: "Confirm Delete!",
         text: "Are you sure you want to delete this post?",

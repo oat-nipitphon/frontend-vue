@@ -15,8 +15,6 @@ const authStore = useAuthStore();
 const { users } = storeToRefs(authStore);
 const { storeLogout } = useAuthStore();
 
-console.log("nav", authStore.users);
-
 const navigation = [
   { name: "Home", href: "/HomeView", current: true },
   { name: "Create Post", href: "/CreatePostView", current: false },
@@ -35,9 +33,7 @@ const headleUserNavigation = (item) => {
     console.log("Your Profile ID ", authStore.users.userProfile.id);
   } else if (item.name === "Sign out") {
     onLogout();
-  } else {
-    console.log("headle user navigation null", item);
-  }
+  } 
 };
 
 const handleUserNavigation = (item) => {
