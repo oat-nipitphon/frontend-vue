@@ -1,5 +1,7 @@
 // import './assets/main.css'
 import "./assets/tailwind.css";
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap/dist/js/bootstrap.bundle'
 
 import { createApp, markRaw } from "vue";
 import { createPinia } from "pinia";

@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import axiosAPI from "@/services/axiosAPI";
 export const usePostStore = defineStore("postStore", {
   state: () => ({
-    post: null,
+    storePostEdit: [],
     storePosts: [],
     postType: [],
     errors: {},
@@ -29,23 +29,22 @@ export const usePostStore = defineStore("postStore", {
     async storeGetPosts() {
       try {
         const res = await fetch(`/api/posts`, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         });
 
         if (!res.status === 200) {
-          this.storePosts = 'store require posts false', res.error;
+          (this.storePosts = "store require posts false"), res.error;
         }
 
         const data = await res.json();
         this.storePosts = data.posts;
 
-        console.log('store require posts true', this.storePosts);
-
+        console.log("store require posts true", this.storePosts);
       } catch (error) {
-        console.error('store get posts function api error ', error);
+        console.error("store get posts function api error ", error);
       }
     },
 
@@ -75,7 +74,7 @@ export const usePostStore = defineStore("postStore", {
         });
 
         if (res.status === 200 || res.status === 201) {
-          console.log('store create post success');
+          console.log("store create post success");
           Swal.fire({
             title: "Successfully",
             text: "Your created post success.",
@@ -86,7 +85,7 @@ export const usePostStore = defineStore("postStore", {
             this.router.push({ name: "HomeView" });
           });
         } else {
-           console.log('store create post false');
+          console.log("store create post false");
           Swal.fire({
             title: "False",
             text: "Your created post false.",
@@ -102,7 +101,7 @@ export const usePostStore = defineStore("postStore", {
       }
     },
 
-    async storeGetPostShow (post) {
+    async storeGetPostShow(post) {
       try {
         const res = await fetch(`/api/posts/${post}`, {
           method: "GET",
@@ -112,32 +111,32 @@ export const usePostStore = defineStore("postStore", {
           },
         });
 
+        if (!res.ok) {
+          console.log('store get post show false ', res);
+        }
+
         const data = await res.json();
 
-        if (res.ok) {
-          console.log("store get post show success ", res);
-          console.log("store get post show success ", data);
-        } else {
-          console.log("store get post show false ", res);
-        }
+        // this.storePostEdit = data.post;
+        console.log('store get post show success ', data.post);
+        return data.post;
+
       } catch (error) {
         console.error("store get post show function api error ", error);
       }
     },
 
-    async storeUpdatePost (formData) {
+    async storeUpdatePost(formData) {
       try {
-        
         for (const [key, value] of formData.entries()) {
           console.log(`${key}:`, value);
         }
-
       } catch (error) {
-        console.error('store update post', error);
+        console.error("store update post", error);
       }
     },
 
-    async storeDeletePost (id) {
+    async storeDeletePost(id) {
       const result = await Swal.fire({
         title: "Confirm Delete!",
         text: "Are you sure you want to delete this post?",
@@ -149,28 +148,37 @@ export const usePostStore = defineStore("postStore", {
         cancelButtonText: "Cancel",
       });
 
-      if (result.isConfirmed) {
-        try {
-          const res = await fetch(`/api/posts/${id}`, {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          });
-
-          if (res.ok) {
-            console.log("store delete post success");
-          } else {
-            console.log("store delete post false");
-          }
-        } catch (error) {
-          console.error("store delete function api ", error);
-        }
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
+      if (!result.isConfirmed) {
         Swal.close();
+        return;
       }
-      return;
+
+      try {
+        const res = await fetch(`/api/posts/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (!res.ok) {
+          console.log("store delete post false");
+          return;
+        }
+
+        Swal.fire({
+          title: "Success",
+          text: "Delete post success",
+          icon: "success",
+          timer: 1200,
+          timerProgressBar: true,
+        }).then(() => {
+          this.router.push({ name: "HomeView" });
+        });
+      } catch (error) {
+        console.error("store delete post function error ", error);
+      }
     },
   },
 });

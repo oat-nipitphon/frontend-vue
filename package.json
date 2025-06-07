@@ -12,6 +12,7 @@
     "@headlessui/vue": "^1.7.23",
     "@tailwindcss/vite": "^4.1.8",
     "axios": "^1.9.0",
+    "bootstrap": "^5.3.6",
     "heroicons": "^2.2.0",
     "pinia": "^3.0.2",
     "quill": "^2.0.3",
